@@ -1,0 +1,37 @@
+---
+- block:
+    - name: Enable SCL in RedHat
+      rhsm_repository:
+        name: rhel-server-rhscl-7-rpms
+        state: enabled
+      when:
+        - ansible_distribution == "Redhat"
+
+    - name: Enable SCL in CentOS
+      yum:
+        name: centos-release-scl
+      when:
+        - ansible_distribution == "CentOS"
+  become: yes
+  when:
+    - enable_scl | bool
+
+- block:
+    - name: "Install Ruby {{ ruby_short_version }}"
+      yum:
+        name:
+          - "rh-ruby{{ ruby_short_version }}"
+          - "rh-ruby{{ ruby_short_version }}-ruby-devel"
+    - file:
+        src: "/opt/rh/rh-ruby{{ ruby_short_version }}/enable"
+        dest: "/etc/profile.d/rh-ruby{{ ruby_short_version }}.sh"
+        state: link
+  become: yes
+  when: enable_scl | bool
+
+- block:
+    - name: "Install Ruby"
+      yum:
+        name: ["ruby", "ruby-devel"]
+      become: yes
+  when: not enable_scl | bool

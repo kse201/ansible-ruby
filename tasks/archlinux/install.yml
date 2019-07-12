@@ -1,0 +1,6 @@
+---
+- name: ensure ruby is installed (in Archlinux)
+  pacman:
+    name: ruby
+  become: yes
+  when: ansible_os_family == "Archlinux"
