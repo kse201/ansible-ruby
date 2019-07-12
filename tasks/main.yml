@@ -1,0 +1,40 @@
+---
+- name: Enable SCL in RedHat
+  rhsm_repository:
+    name: rhel-server-rhscl-7-rpms
+    state: enabled
+  become: yes
+  when:
+    - ansible_distribution == "Redhat"
+    - enable_scl | bool
+
+- name: "Install Ruby {{ ruby_short_version }}"
+  yum:
+    name:
+      - "rh-ruby{{ ruby_short_version }}"
+      - "rh-ruby{{ ruby_short_version }}-ruby-devel"
+  become: yes
+  when:
+    - ansible_distribution == "Redhat"
+    - enable_scl | bool
+
+- file:
+    src: "/opt/rh/rh-ruby{{ ruby_short_version }}/enable"
+    dest: "/etc/profile.d/rh-ruby{{ ruby_short_version }}.sh"
+    state: link
+  become: yes
+  when:
+    - enable_scl | bool
+
+- name: ensure ruby is installed (in Archlinux)
+  pacman:
+    name: ruby
+  when: ansible_os_family == "Archlinux"
+  become: yes
+
+- name: install additional rubygems
+  gem:
+    name: "{{ item }}"
+    user_install: yes
+  with_items:
+    - "{{ rubygems }}"
