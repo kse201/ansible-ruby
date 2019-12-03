@@ -3,4 +3,7 @@ ruby_version: 2.6.0
 enable_scl: true
 ruby_short_version:
   "{{ ruby_version | regex_replace('(\\d+)\\.(\\d+)\\.\\d+','\\1\\2') }}"
-rubygems: []
+rubygems:
+  - bundler
+  - rubocop
+  - solargraph
